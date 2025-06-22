@@ -1,2 +1,1 @@
-# Market-Making-Simulator
-MMS
+# Stress Adaptive Market Maker (SAMM)
