@@ -21,21 +21,21 @@ def download_latest_data(symbols: list) -> dict:
 
     return latest_prices
 
-def download_all_time_single_stock_data(ticker: str, start_date, end_date):
-    data = yf.download(ticker, start=start_date, end=end_date)
+def download_all_time_single_stock_data(symbol: str, start_date, end_date):
+    data = yf.download(symbol, start=start_date, end=end_date)
 
     if isinstance(data.columns, pd.MultiIndex):
         data.columns = data.columns.get_level_values(0)
 
     data = data.reset_index()
 
-    data['Symbol'] = ticker
+    data['Symbol'] = symbol
     data = data[['Date', 'Symbol', 'Open', 'High', 'Low', 'Close', 'Volume']]
 
     numerical_columns = ['Open', 'High', 'Low', 'Close']
     data[numerical_columns] = data[numerical_columns].round(2)
 
-    data.to_csv(f'{ticker}_market_data.csv', index=False)
+    data.to_csv(f'{symbol}_market_data.csv', index=False)
 
 def download_all_time_data():
     symbols = [
