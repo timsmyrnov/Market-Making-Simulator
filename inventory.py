@@ -12,9 +12,9 @@ class Inventory:
 
     def net_exposure(self, prices: dict) -> float:
         exposure = 0.0
-        for asset, quantity in self.positions.items():
+        for asset, qty in self.positions.items():
             price = prices.get(asset, 0.0)
-            exposure += quantity * price
+            exposure += qty * price
         return exposure
 
     def __str__(self) -> str:
