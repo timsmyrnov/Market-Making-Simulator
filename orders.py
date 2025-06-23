@@ -9,6 +9,7 @@ class Order:
     def __init__(self, side: str, price: float, qty: int) -> None:
         if qty <= 0:
             raise ValueError("Quantity must be greater than 0.")
+
         if side.upper() not in {"BUY", "SELL"}:
             raise ValueError("Side must be 'BUY' or 'SELL'.")
 

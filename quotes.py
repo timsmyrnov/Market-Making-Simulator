@@ -1,14 +1,15 @@
 import itertools
 
-_quote_id_generator = itertools.count(1)
+_order_id_generator = itertools.count(1)
 
-def generate_quote_id() -> int:
-    return next(_quote_id_generator)
+def generate_order_id() -> int:
+    return next(_order_id_generator)
 
 class Quote:
     def __init__(self, bid: float, ask: float, bid_size: int, ask_size: int) -> None:
         if bid >= ask:
             raise ValueError("Bid must be less than Ask.")
+
         if bid_size <= 0 or ask_size <= 0:
             raise ValueError("Bid size and Ask size must be greater than 0.")
 
@@ -18,7 +19,7 @@ class Quote:
         self.bid_size = bid_size
         self.ask_size = ask_size
 
-        self.id = generate_quote_id()
+        self.id = generate_order_id()
 
     def spread(self) -> float:
         return self.ask - self.bid
@@ -29,6 +30,7 @@ class Quote:
     def update(self, bid: float, ask: float, bid_size: int, ask_size: int) -> None:
         if bid >= ask:
             raise ValueError("Bid must be less than Ask.")
+
         if bid_size <= 0 or ask_size <= 0:
             raise ValueError("Bid size and Ask size must be greater than 0.")
 
