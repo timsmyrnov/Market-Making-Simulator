@@ -8,7 +8,7 @@ import investor_behavior as ib
 import market_maker as mm
 
 def run_simulation():
-    order_book = ob.OrderBook()
+    AAPL_order_book = ob.OrderBook()
     market_maker = mm.MarketMaker()
     latest_data = fmd.download_latest_data(["AAPL", "MSFT", "GOOG", "NFLX", "TSLA"])
 
@@ -21,7 +21,7 @@ def run_simulation():
 
         latest_data = mb.generate_market_tick(latest_data)
         new_quote = market_maker.quote("AAPL", latest_data)
-        order_book.handle_quote(new_quote)
+        AAPL_order_book.handle_quote(new_quote)
         print(new_quote, round(latest_data["AAPL"], 2))
 
         time.sleep(0.05)
