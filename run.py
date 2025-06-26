@@ -14,7 +14,7 @@ def run_simulation():
 
     while True:
         # Generate quotes
-        # Generate offers
+        # Generate orders
         # Generate macro events
         # Generate stock price movement
         # Simulate mm behavior
