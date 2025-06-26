@@ -23,7 +23,8 @@ def order(
 
     return Order(side, price, qty, symbol, "indv")
 
-for _ in range(100):
-    o = order()
-    print(o)
-    time.sleep(0.05)
+if __name__ == "__main__":
+    for _ in range(100):
+        o = order()
+        print(o)
+        time.sleep(0.05)

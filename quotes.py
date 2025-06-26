@@ -49,7 +49,7 @@ class Quote:
 
     def __str__(self) -> str:
         return (
-            f"\033[96m#{self.id:<4}\033[0m"
+            f"\033[96m#{self.id:<4}\033[0m  "
             f"\033[91m{self.bid:<7.2f}\033[0m / "
             f"\033[94m{self.ask:<7.2f}\033[0m  "
             f"\033[95m{self.bid_size:<4}\033[0m x "
