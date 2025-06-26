@@ -6,7 +6,15 @@ def generate_order_id() -> int:
     return next(_order_id_generator)
 
 class Quote:
-    def __init__(self, bid: float, ask: float, bid_size: int, ask_size: int) -> None:
+    def __init__(
+        self,
+        bid: float,
+        ask: float,
+        bid_size: int,
+        ask_size: int,
+        symbol: str = "AAPL",
+        src: str = "mm"
+    ) -> None:
         if bid >= ask:
             raise ValueError("Bid must be less than Ask.")
 
@@ -15,10 +23,10 @@ class Quote:
 
         self.bid = bid
         self.ask = ask
-
         self.bid_size = bid_size
         self.ask_size = ask_size
-
+        self.symbol = symbol.upper()
+        self.src = src.lower()
         self.id = generate_order_id()
 
     def spread(self) -> float:
@@ -36,31 +44,32 @@ class Quote:
 
         self.bid = bid
         self.ask = ask
-
         self.bid_size = bid_size
         self.ask_size = ask_size
 
     def __str__(self) -> str:
         return (
-            f"\033[96m#{self.id}\033[0m: "
-            f"\033[91m{self.bid:.2f}"
-            f"\033[0m/\033[94m{self.ask:.2f}"
-            f"\033[0m \033[95m{self.bid_size}"
-            f"\033[0mx\033[92m{self.ask_size}\033[0m"
+            f"\033[96m#{self.id:<4}\033[0m"
+            f"\033[91m{self.bid:<7.2f}\033[0m / "
+            f"\033[94m{self.ask:<7.2f}\033[0m  "
+            f"\033[95m{self.bid_size:<4}\033[0m x "
+            f"\033[92m{self.ask_size:<4}\033[0m "
+            f"\033[90m[{self.symbol}]\033[0m "
+            f"\033[94m{self.src:<4}\033[0m"
         )
     
 if __name__ == "__main__":
     quotes = [
-        Quote(99.50, 99.55, 500, 300),
-        Quote(100.00, 100.05, 1000, 800),
-        Quote(100.20, 100.30, 200, 150),
-        Quote(99.75, 99.85, 750, 500),
-        Quote(101.10, 101.25, 100, 50),
-        Quote(98.90, 99.10, 600, 700),
-        Quote(100.45, 100.50, 350, 350),
-        Quote(101.75, 101.80, 150, 120),
-        Quote(102.00, 102.15, 90, 200),
-        Quote(99.00, 99.20, 1000, 1000)
+        Quote(99.50, 99.55, 500, 300, "AAPL"),
+        Quote(100.00, 100.05, 1000, 800, "AAPL"),
+        Quote(100.20, 100.30, 200, 150, "AAPL"),
+        Quote(99.75, 99.85, 750, 500, "AAPL"),
+        Quote(101.10, 101.25, 100, 50, "AAPL"),
+        Quote(98.90, 99.10, 600, 700, "AAPL"),
+        Quote(100.45, 100.50, 350, 350, "AAPL"),
+        Quote(101.75, 101.80, 150, 120, "AAPL"),
+        Quote(102.00, 102.15, 90, 200, "AAPL"),
+        Quote(99.00, 99.20, 1000, 1000, "AAPL")
     ]
 
     for q in quotes:

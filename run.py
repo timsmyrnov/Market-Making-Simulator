@@ -10,6 +10,7 @@ def run_simulation():
         # generate offers
         # generate macro events
         # generate stock price movement
+        # simulate mm behavior
         ...
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from orders import Order
 
 # MODIFY LOGIC AFTER MARKET BEHAVIOR IMPLEMENTATION
 
-def generate_order(
+def order(
     mid_price: float = 100.00,
     price_volatility: float = 0.50,
     min_qty: int = 100,
@@ -19,10 +19,11 @@ def generate_order(
     price = round(mid_price + price_fluctuation, 2)
 
     qty = random.randint(min_qty, max_qty)
+    symbol = random.choice(["AAPL", "MSFT", "NVDA", "GOOGL", "BRK.B", "BA", "TSLA", "NFLX"])
 
-    return Order(side=side, price=price, qty=qty)
+    return Order(side, price, qty, symbol, "indv")
 
 for _ in range(100):
-    o = generate_order()
+    o = order()
     print(o)
     time.sleep(0.05)

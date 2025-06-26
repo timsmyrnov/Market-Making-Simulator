@@ -25,3 +25,8 @@ class OrderBook:
 
         self.handle_order(bid_order)
         self.handle_order(ask_order)
+
+book = OrderBook()
+o = Order("BUY", 101.0, 60, )
+
+book.handle_order()
