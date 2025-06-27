@@ -11,6 +11,7 @@ def run_simulation():
     AAPL_order_book = ob.OrderBook()
     market_maker = mm.MarketMaker()
     latest_data = fmd.download_latest_data(["AAPL", "MSFT", "GOOG", "NFLX", "TSLA"])
+    ticker = "AAPL"
 
     while True:
         # Generate quotes
@@ -20,11 +21,16 @@ def run_simulation():
         # Simulate mm behavior
 
         latest_data = mb.generate_market_tick(latest_data)
-        new_quote = market_maker.quote("AAPL", latest_data)
-        AAPL_order_book.handle_quote(new_quote)
-        print(new_quote, round(latest_data["AAPL"], 2))
+        new_quote = market_maker.quote(ticker, latest_data)
+        new_order = ib.order(ticker, latest_data)
 
-        time.sleep(0.05)
+        AAPL_order_book.handle_quote(new_quote)
+        AAPL_order_book.handle_order(new_order)
+
+        print(new_quote)
+        print(new_order)
+
+        time.sleep(1)
 
 if __name__ == "__main__":
     print(run_simulation())

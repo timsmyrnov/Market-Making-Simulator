@@ -26,7 +26,7 @@ class OrderBook:
         self.handle_order(bid_order)
         self.handle_order(ask_order)
 
-    def display(self):
+    def __str__(self):
         output = []
         output.append("\n----- ORDER BOOK -----")
 
@@ -76,4 +76,4 @@ if __name__ == "__main__":
         book.handle_order(o)
         book.handle_quote(q)
 
-    print(book.display())
+    print(book)

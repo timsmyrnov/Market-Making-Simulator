@@ -4,27 +4,20 @@ from orders import Order
 
 # MODIFY LOGIC AFTER MARKET BEHAVIOR IMPLEMENTATION
 
-def order(
-    mid_price: float = 100.00,
-    price_volatility: float = 0.50,
-    min_qty: int = 100,
-    max_qty: int = 1000
-) -> Order:
-    """
-    Generates a random order (buy or sell) around a mid-price
-    """
+def order(symbol: str, data: dict) -> Order:
+    mid_price = data[symbol]
+    volatility = 0.50
+    min_qty = 100
+    max_qty = 1000
+
     side = random.choice(["BUY", "SELL"])
 
-    price_fluctuation = random.uniform(-price_volatility, price_volatility)
-    price = round(mid_price + price_fluctuation, 2)
+    fluct = random.uniform(-volatility, volatility)
+    price = round(mid_price + fluct, 2)
 
     qty = random.randint(min_qty, max_qty)
-    symbol = random.choice(["AAPL", "MSFT", "NVDA", "GOOGL", "BRK.B", "BA", "TSLA", "NFLX"])
 
     return Order(side, price, qty, symbol, "indv")
 
 if __name__ == "__main__":
-    for _ in range(100):
-        o = order()
-        print(o)
-        time.sleep(0.05)
+    print(order("MSFT", {"AAPL": 101, "MSFT": 201}))
