@@ -30,7 +30,7 @@ def run_simulation():
         print(new_quote)
         print(new_order)
 
-        time.sleep(1)
+        time.sleep(0.2)
 
 if __name__ == "__main__":
     print(run_simulation())

@@ -5,7 +5,7 @@ from quotes import Quote
 class MarketMaker:
     def __init__(
         self,
-        mm_type: str = "PMM", # "PMM", "CMM", or "Preferred"
+        mm_type: str = "Preferred", # "PMM", "CMM", or "Preferred"
         max_spread: float = 0.50,
         quote_lifetime: float = 5.0,
         aggressiveness: float = 0.7, # 0.0 - 1.0
