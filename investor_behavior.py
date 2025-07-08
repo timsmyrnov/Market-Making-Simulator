@@ -2,8 +2,6 @@ import random
 import time
 from orders import Order
 
-# MODIFY LOGIC AFTER MARKET BEHAVIOR IMPLEMENTATION
-
 def order(symbol: str, data: dict) -> Order:
     mid_price = data[symbol]
     volatility = 0.50
