@@ -1,1 +1,1 @@
-# Stress Adaptive Market Maker (SAMM)
+# Trader Operated Market Maker (TOMM)

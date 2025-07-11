@@ -23,9 +23,10 @@ def run_simulation():
 
         prices = mb.generate_market_tick(prices)
 
-        if random.randint(1, 10) == 1:
+        if random.randint(1, 14) == 1:
             macro_event = random.choice([me.generate_positive_event, me.generate_negative_event])()
             prices = mb.generate_market_fluctuation(prices, macro_event)
+            print()
 
         new_quote = market_maker.quote(ticker, prices)
         new_order = ib.order(ticker, prices)
@@ -33,7 +34,7 @@ def run_simulation():
         AAPL_order_book.handle_quote(new_quote)
         AAPL_order_book.handle_order(new_order)
 
-        print('\n', new_quote)
+        print(new_quote)
         print(new_order)
 
         time.sleep(0.1)
