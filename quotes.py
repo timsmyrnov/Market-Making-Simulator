@@ -6,18 +6,9 @@ def generate_order_id() -> int:
     return next(_order_id_generator)
 
 class Quote:
-    def __init__(
-        self,
-        bid: float,
-        ask: float,
-        bid_size: int,
-        ask_size: int,
-        symbol: str = "AAPL",
-        src: str = "mm"
-    ) -> None:
+    def __init__(self, bid: float, ask: float, bid_size: int, ask_size: int, symbol: str, src: str = "mm") -> None:
         if bid >= ask:
             raise ValueError("Bid must be less than Ask.")
-
         if bid_size <= 0 or ask_size <= 0:
             raise ValueError("Bid size and Ask size must be greater than 0.")
 

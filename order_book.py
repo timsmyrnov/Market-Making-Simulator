@@ -10,11 +10,19 @@ class OrderBook:
 
     def handle_order(self, order: Order):
         if order.side == "BUY":
+            # match bid to existing ask
+            if order.price in self.asks and self.asks[order.price] >= order.qty:
+                return
+
             if order.price not in self.bids:
                 self.bids[order.price] = deque()
             self.bids[order.price].append(order)
 
         else:
+            # match ask to existing bid
+            if order.price in self.bids and self.bids[order.price] >= order.qty:
+                return
+
             if order.price not in self.asks:
                 self.asks[order.price] = deque()
             self.asks[order.price].append(order)
@@ -25,6 +33,9 @@ class OrderBook:
 
         self.handle_order(bid_order)
         self.handle_order(ask_order)
+
+    def get_tob(self):
+        ...
 
     def __str__(self):
         output = []
