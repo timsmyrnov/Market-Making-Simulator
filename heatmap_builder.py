@@ -16,12 +16,10 @@ class HeatmapBuilder:
             for asset_b in self.assets:
                 if asset_a == asset_b:
                     curr_list.append(1)
-
                 else:
                     vol_corr = self.get_vol_corr(asset_a, asset_b, start_date, end_date, vol_anomaly_pct)
                     lq_corr = self.get_lq_corr(asset_a, asset_b, start_date, end_date, lq_anomaly_pct)
                     norm_corr = 0.5 * vol_corr + 0.5 * lq_corr
-
                     curr_list.append(norm_corr)
 
             self.matrix.append(curr_list)
