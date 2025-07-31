@@ -7,24 +7,27 @@ class HeatmapBuilder:
         self.assets = assets
         self._vol_cache = {}
         self._lq_cache = {}
-        self.matrix = []
+        self._sprd_cache = {}
 
-    def compute_values(self, start_date: str, end_date: str, vol_anomaly_pct: float=0.9, lq_anomaly_pct: float=0.9) -> float:
+    def compute_values(self, start_date: str, end_date: str, vol_anomaly_pct: float=0.9, lq_anomaly_pct: float=0.9, sprd_anomaly_pct: float=0.9) -> pd.DataFrame:
+        matrix = []
         for asset_a in self.assets:
-            curr_list = []
+            curr_row = []
 
             for asset_b in self.assets:
                 if asset_a == asset_b:
-                    curr_list.append(1)
+                    curr_row.append(1)
                 else:
                     vol_corr = self.get_vol_corr(asset_a, asset_b, start_date, end_date, vol_anomaly_pct)
                     lq_corr = self.get_lq_corr(asset_a, asset_b, start_date, end_date, lq_anomaly_pct)
-                    norm_corr = 0.5 * vol_corr + 0.5 * lq_corr
-                    curr_list.append(norm_corr)
+                    sprd_corr = self.get_sprd_corr(asset_a, asset_b, start_date, end_date, sprd_anomaly_pct)
+                    valid = [corr for corr in [vol_corr, lq_corr, sprd_corr] if not np.isnan(corr)]
+                    norm_corr = np.mean(valid) if valid else np.nan
+                    curr_row.append(norm_corr)
 
-            self.matrix.append(curr_list)
+            matrix.append(curr_row)
 
-        return self.matrix
+        return pd.DataFrame(matrix, index=self.assets, columns=self.assets)
 
     def get_vol(self, asset: str, start_date: str, end_date: str) -> pd.Series:
         key = (asset, start_date, end_date)
@@ -52,7 +55,6 @@ class HeatmapBuilder:
 
         data = blp.bdh(tickers=asset, flds=['PX_LAST', 'PX_VOLUME'], start_date=start_date, end_date=end_date)
 
-        # Handle missing volume
         if isinstance(data.columns, pd.MultiIndex):
             try:
                 price = data[asset]['PX_LAST']
@@ -76,6 +78,36 @@ class HeatmapBuilder:
 
         self._lq_cache[key] = illiq
         return illiq
+
+    def get_sprd(self, asset: str, start_date: str, end_date: str) -> pd.Series:
+        key = (asset, start_date, end_date)
+        if key in self._sprd_cache:
+            return self._sprd_cache[key]
+
+        data = blp.bdh(tickers=asset, flds=['BID', 'ASK'], start_date=start_date, end_date=end_date)
+
+        if isinstance(data.columns, pd.MultiIndex):
+            try:
+                bid = data[asset]['BID']
+                ask = data[asset]['ASK']
+            except KeyError:
+                print(f"Skipping spread calculation for {asset}: data is not available.")
+                self._sprd_cache[key] = pd.Series(dtype=float)
+                return self._sprd_cache[key]
+        else:
+            if 'BID' not in data.columns or 'ASK' not in data.columns:
+                print(f"Skipping spread calculation for {asset}: data is not available.")
+                self._sprd_cache[key] = pd.Series(dtype=float)
+                return self._sprd_cache[key]
+            bid = data['BID']
+            ask = data['ASK']
+
+        bid = bid.replace(0, np.nan)
+        ask = ask.replace(0, np.nan)
+        sprd = ask - bid
+
+        self._sprd_cache[key] = sprd
+        return sprd
 
     def _get_cond_corr(self, series_a: pd.Series, series_b: pd.Series, anomaly_pct: float, label_a: str='a', label_b: str='b') -> float:
         threshold = series_a.quantile(anomaly_pct)
@@ -105,9 +137,19 @@ class HeatmapBuilder:
 
         return self._get_cond_corr(lq_a, lq_b, anomaly_pct, label_a='lq_a', label_b='lq_b')
 
+    def get_sprd_corr(self, asset_a: str, asset_b: str, start_date: str, end_date: str, anomaly_pct: float) -> float:
+        sprd_a = self.get_sprd(asset_a, start_date, end_date)
+        sprd_b = self.get_sprd(asset_b, start_date, end_date)
+
+        return self._get_cond_corr(sprd_a, sprd_b, anomaly_pct, label_a='sprd_a', label_b='sprd_b')
+
+    def _is_valid_series(self, series: pd.Series) -> bool:
+        return isinstance(series, pd.Series) and not series.dropna().empty
+
     def clear_cache(self) -> None:
         self._vol_cache.clear()
         self._lq_cache.clear()
+        self._sprd_cache.clear()
 
 if __name__ == '__main__':
     assets = [
