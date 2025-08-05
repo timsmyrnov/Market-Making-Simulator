@@ -36,4 +36,4 @@ class MarketMaker:
         bid_size = random.randint(min_size, max_size)
         ask_size = random.randint(min_size, max_size)
 
-        return Quote(bid, ask, bid_size, ask_size)
+        return Quote(bid, ask, bid_size, ask_size, symbol)

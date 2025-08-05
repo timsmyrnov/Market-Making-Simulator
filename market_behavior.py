@@ -21,6 +21,7 @@ def generate_market_fluctuation(curr_prices: dict, event: tuple):
         f"\033[92m" if sign == 1 else f"\033[91m",
         end=""
     )
+    print()
     print(f"--- MARKET EVENT: {event_name.replace('_', ' ').title()} ---")
     print(f"Impact Magnitude: {sign * magnitude:+.2f}\033[0m\n")
 
