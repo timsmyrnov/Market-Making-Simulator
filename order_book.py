@@ -11,9 +11,9 @@ class OrderBook:
     def handle_order(self, order: Order):
         if order.side == 'BUY':
             # Match bid to existing ask
-            if order.price in self.asks:
+            if order.order_type == 'LIMIT' and order.price in self.asks:
                 total_ask_qty = sum(o.qty for o in self.asks[order.price])
-                if total_ask_qty >= order.qty:
+                if order.qty < total_ask_qty:
                     return
 
             if order.price not in self.bids:
@@ -24,7 +24,7 @@ class OrderBook:
             # Match ask to existing bid
             if order.price in self.bids:
                 total_bid_qty = sum(o.qty for o in self.bids[order.price])
-                if total_bid_qty >= order.qty:
+                if order.qty < total_bid_qty:
                     return
 
             if order.price not in self.asks:
@@ -32,14 +32,21 @@ class OrderBook:
             self.asks[order.price].append(order)
 
     def handle_quote(self, quote: Quote):
-        bid_order = Order('BUY', quote.bid, quote.bid_size, quote.symbol, 'LIMIT', quote.src)
-        ask_order = Order('SELL', quote.ask, quote.ask_size, quote.symbol, 'LIMIT', quote.src)
+        bid_order = Order('BUY', quote.symbol, 'LIMIT', price=quote.bid, qty=quote.bid_size, src=quote.src)
+        ask_order = Order('SELL', quote.symbol, 'LIMIT', price=quote.ask, qty=quote.ask_size, src=quote.src)
 
         self.handle_order(bid_order)
         self.handle_order(ask_order)
 
-    def get_tob(self):
-        ...
+    def get_tob(self) -> tuple:
+        bid = max(self.bids.keys(), default=None)
+        ask = min(self.asks.keys(), default=None)
+
+        bid_size = sum(o.qty for o in self.bids.get(bid, [])) if bid is not None else 0
+        ask_size = sum(o.qty for o in self.asks.get(ask, [])) if ask is not None else 0
+
+        spread = (ask - bid) if (bid is not None and ask is not None) else None
+        return (bid, bid_size, ask, ask_size, spread)
 
     def __str__(self):
         output = []
@@ -59,32 +66,31 @@ class OrderBook:
 
 if __name__ == '__main__':
     book = OrderBook()
-    o = Order('BUY', 101.0, 60, 'AAPL', 'indv')
 
     orders = [
-        Order('BUY', 101.00, 60, 'AAPL', 'indv'),
-        Order('SELL', 101.20, 100, 'AAPL', 'hft'),
-        Order('BUY', 100.90, 150, 'AAPL', 'mm'),
-        Order('SELL', 101.30, 80, 'AAPL', 'indv'),
-        Order('BUY', 100.95, 120, 'AAPL', 'mm'),
-        Order('SELL', 101.10, 90, 'AAPL', 'hft'),
-        Order('BUY', 100.80, 200, 'AAPL', 'indv'),
-        Order('SELL', 101.25, 50, 'AAPL', 'mm'),
-        Order('BUY', 101.05, 70, 'AAPL', 'hft'),
-        Order('SELL', 101.15, 130, 'AAPL', 'indv'),
+        Order('BUY',  'AAPL', 'LIMIT', price=100.70, qty=60,  src='indv'),
+        Order('SELL', 'AAPL', 'LIMIT', price=100.90, qty=100, src='hft'),
+        Order('BUY',  'AAPL', 'LIMIT', price=100.65, qty=150, src='mm'),
+        Order('SELL', 'AAPL', 'LIMIT', price=100.95, qty=80,  src='indv'),
+        Order('BUY',  'AAPL', 'LIMIT', price=100.60, qty=120, src='mm'),
+        Order('SELL', 'AAPL', 'LIMIT', price=101.00, qty=90,  src='hft'),
+        Order('BUY',  'AAPL', 'LIMIT', price=100.55, qty=200, src='indv'),
+        Order('SELL', 'AAPL', 'LIMIT', price=101.05, qty=50,  src='mm'),
+        Order('BUY',  'AAPL', 'LIMIT', price=100.75, qty=70,  src='hft'),
+        Order('SELL', 'AAPL', 'LIMIT', price=100.85, qty=130, src='indv'),
     ]
 
     quotes = [
-        Quote(99.50, 99.55, 500, 300, 'AAPL'),
-        Quote(100.00, 100.05, 1000, 800, 'AAPL'),
-        Quote(100.20, 100.30, 200, 150, 'AAPL'),
-        Quote(99.75, 99.85, 750, 500, 'AAPL'),
-        Quote(101.10, 101.25, 100, 50, 'AAPL'),
-        Quote(98.90, 99.10, 600, 700, 'AAPL'),
-        Quote(100.45, 100.50, 350, 350, 'AAPL'),
-        Quote(101.75, 101.80, 150, 120, 'AAPL'),
-        Quote(102.00, 102.15, 90, 200, 'AAPL'),
-        Quote(99.00, 99.20, 1000, 1000, 'AAPL')
+        Quote(100.60, 100.85, 500, 300, 'AAPL'),
+        Quote(100.62, 100.88, 1000, 800, 'AAPL'),
+        Quote(100.70, 100.90, 200, 150, 'AAPL'),
+        Quote(100.58, 100.86, 750, 500, 'AAPL'),
+        Quote(100.76, 100.95, 100, 50, 'AAPL'),
+        Quote(100.55, 100.89, 600, 700, 'AAPL'),
+        Quote(100.73, 100.92, 350, 350, 'AAPL'),
+        Quote(100.78, 100.96, 150, 120, 'AAPL'),
+        Quote(100.80, 101.00, 90, 200, 'AAPL'),
+        Quote(100.59, 100.87, 1000, 1000, 'AAPL'),
     ]
 
     for o, q in zip(orders, quotes):
@@ -92,3 +98,4 @@ if __name__ == '__main__':
         book.handle_quote(q)
 
     print(book)
+    print(book.get_tob())
