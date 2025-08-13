@@ -18,7 +18,6 @@ class Order:
             raise ValueError('Side must be "BUY" or "SELL".')
         if order_type not in {'LIMIT', 'MARKET'}:
             raise ValueError('Order type must be "LIMIT" or "MARKET".')
-
         if order_type == 'LIMIT' and price is None:
             raise ValueError('Limit orders must include a price.')
         if order_type == 'MARKET' and price is not None:
